@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelling Dialysis Patient Questionnaire</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9eef2;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        /* CSS untuk KOP Surat */
+        .letterhead {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid #0056b3;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .logo-rssa {
+            width: 90px;
+            height: 90px;
+            margin-right: 20px;
+            object-fit: contain;
+        }
+        .header-text {
+            text-align: center;
+            flex: 1;
+        }
+        .header-text h3 {
+            margin: 0;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .header-text h2 {
+            margin: 5px 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            color: #0056b3;
+        }
+        .header-text p {
+            margin: 5px 0 0 0;
+            font-size: 12px;
+            color: #555;
+        }
+
+        h2.title {
+            text-align: center;
+            text-transform: uppercase;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* Styling untuk Input & Placeholder Abu-abu */
+        .form-group input, .form-group textarea, .form-group select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #000; /* Warna teks ketika diketik */
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: #999; /* Warna abu-abu untuk contoh data */
+            font-style: italic;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .destination {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #2c3e50;
+            margin-bottom: 20px;
+        }
+        .signature {
+            margin-top: 50px;
+            text-align: center;
+            float: right;
+            width: 300px;
+        }
+        .signature p { margin: 2px 0; }
+        .doc-name {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-top: 40px !important;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { opacity: 0.9; }
+        button.whatsapp { background-color: #25D366; }
+        button.pdf { background-color: #e74c3c; }
+        
+        @media print {
+            body { background: none; }
+            .container { box-shadow: none; border: none; }
+            .actions { display: none; }
+            input, textarea, select {
+                border: none !important;
+                background: none !important;
+                padding: 0 !important;
+                color: #000 !important;
+                font-style: normal !important;
+            }
+            input::placeholder, textarea::placeholder {
+                color: transparent !important; /* Sembunyikan placeholder saat cetak jika kosong */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="invoice-area">
+    
+    <!-- KOP SURAT -->
+    <div class="letterhead">
+        <!-- Ganti src ini dengan file logo RSSA asli Anda -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Ministry_of_Health_of_Indonesia_logo.svg/1200px-Ministry_of_Health_of_Indonesia_logo.svg.png" alt="Logo RSSA" class="logo-rssa">
+        <div class="header-text">
+            <h3>Divisi Nefrologi & Hipertensi Ilmu Penyakit Dalam</h3>
+            <h2>RSUD Dr. Saiful Anwar Prov. Jatim</h2>
+            <p>Jl. Jaksa Agung Suprapto No. 2 Malang, Telp : (0341)360360 Fax : (0341) 362167</p>
+        </div>
+    </div>
+
+    <h2 class="title">Travelling Dialysis Patient Questionnaire</h2>
+    
+    <div class="destination">
+        <strong>Kepada Yth.:</strong><br>
+        <input type="text" id="dest_hospital" placeholder="Kepala Ruang Hemodialisa RSU PINDAD TUREN" style="width: 100%; border:none; background:none; font-weight:bold; margin-top:5px;"><br>
+        Di Tempat
+    </div>
+
+    <div class="form-group">
+        <label>Patient's Name</label>
+        <input type="text" id="patient_name" placeholder="ALIFAH">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Age</label>
+            <input type="text" id="age" placeholder="46 tahun 10 bulan 9 hari">
+        </div>
+        <div class="form-group">
+            <label>Patient's Dry Weight</label>
+            <input type="text" id="dry_weight" placeholder="49 kg">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Recent Address</label>
+        <textarea id="address" rows="2" placeholder="JL. GATOT SUBROTO RT.01 RW.03 KEC. GADINGREJO KEL.PETAHUNAN PASURUAN"></textarea>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Diagnosis and History</label>
+            <input type="text" id="diagnosis" placeholder="CKD st 5">
+        </div>
+        <div class="form-group">
+            <label>In the patient home trained been on dialysis</label>
+            <input type="text" id="home_trained" placeholder="-">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>How Long has the patient been on dialysis</label>
+            <input type="text" id="how_long" placeholder="0 years 6 months">
+        </div>
+        <div class="form-group">
+            <label>Recent Blood Pressure Status</label>
+            <input type="text" id="bp_status" placeholder="132/72 mmHg">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>What medications is the patient presently taking</label>
+        <input type="text" id="medications" placeholder="Contoh: Amlodipine 5mg, Captopril, dll">
+    </div>
+
+    <div class="form-group">
+        <label>Laboratory value over the past months</label>
+        <textarea id="lab_values" rows="2" placeholder="Hb : 7,6 (01/06/2026) Ureum: 72,9 (09/06/2026) Creatinine : 5,77 (14/05/2026)"></textarea>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Composition of dialysate</label>
+            <input type="text" id="dialysate" placeholder="Bicarbonate">
+        </div>
+        <div class="form-group">
+            <label>What Dializer and Delivery system is the patient correctly using</label>
+            <input type="text" id="dializer" placeholder="NIPRO FB 130 H">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Does the patient have a shunt of fistula</label>
+            <input type="text" id="shunt" placeholder="AV Shunt letak brachiocephalica (S)">
+        </div>
+        <div class="form-group">
+            <label>Type of heparinization used</label>
+            <input type="text" id="heparinization" placeholder="Bolus 2000 iu, maintenance 1000 iu/hrs">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Number of runs per week</label>
+            <input type="text" id="runs_week" placeholder="2 Time/week">
+        </div>
+        <div class="form-group">
+            <label>How long per run</label>
+            <input type="text" id="long_run" placeholder="5 hrs">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>TMP use</label>
+            <input type="text" id="tmp" placeholder="100 – 200">
+        </div>
+        <div class="form-group">
+            <label>Hepatitis Sero marker</label>
+            <input type="text" id="hepatitis" placeholder="Non reaktif">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Blood transfusion</label>
+            <input type="text" id="transfusion" placeholder="1 time">
+        </div>
+        <div class="form-group">
+            <label>Allergies</label>
+            <input type="text" id="allergies" placeholder="-">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Diet</label>
+        <input type="text" id="diet" placeholder="renal">
+    </div>
+
+    <div class="form-group">
+        <label>Know complication with dialysis runs</label>
+        <input type="text" id="complication" placeholder="Contoh: Hipotensi / Kram / -">
+    </div>
+
+    <div class="form-group">
+        <label>Further comment</label>
+        <textarea id="comment" rows="2" placeholder="Pindah rutin di RSUD Dr. SOEDARSONO PASURUAN"></textarea>
+    </div>
+
+    <div style="clear: both;"></div>
+    
+    <div class="signature">
+        <p>Renal Physician,</p>
+        <p class="doc-name">Dr. dr. Atma Gunawan, SpPD, KGH</p>
+        <p>NIP. 19651005 1995503 1 004</p>
+    </div>
+
+    <div style="clear: both;"></div>
+</div>
+
+<div class="actions no-print">
+    <button onclick="window.print()">🖨️ Cetak Dokumen</button>
+    <button class="pdf" onclick="generatePDF()">📄 Simpan PDF</button>
+    <button class="whatsapp" onclick="sendWhatsApp()">💬 Kirim via WA</button>
+</div>
+
+<script>
+    // Fungsi Simpan PDF
+    function generatePDF() {
+        const element = document.getElementById('invoice-area');
+        // Cek apakah ada input yang masih kosong, jika PDF diinginkan tanpa placeholder
+        const opt = {
+            margin:       10,
+            filename:     'Travelling_Dialysis_Patient.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        if(typeof html2pdf === 'undefined') {
+            alert("Library PDF belum selesai dimuat, coba lagi dalam 2 detik.");
+            return;
+        }
+        html2pdf().set(opt).from(element).save();
+    }
+
+    // Fungsi Kirim WhatsApp
+    function sendWhatsApp() {
+        // Helper untuk mengambil nilai atau '-' jika kosong
+        const getVal = (id) => document.getElementById(id).value || '-';
+        
+        // Ambil nilai dari form
+        const name = getVal('patient_name');
+        const dest = getVal('dest_hospital');
+        const age = getVal('age');
+        const address = getVal('address');
+        const diagnosis = getVal('diagnosis');
+        const comment = getVal('comment');
+        
+        // Format pesan WhatsApp
+        let message = `*TRAVELLING DIALYSIS PATIENT QUESTIONNAIRE*\n\n`;
+        message += `*Kepada Yth:* ${dest}\n\n`;
+        message += `*Patient's Name:* ${name}\n`;
+        message += `*Age:* ${age}\n`;
+        message += `*Address:* ${address}\n`;
+        message += `*Diagnosis:* ${diagnosis}\n`;
+        message += `*Further comment:* ${comment}\n\n`;
+        message += `_Dokumen lengkap dalam format PDF/Cetak telah disiapkan._\n`;
+        message += `*Dokter:* Dr. dr. Atma Gunawan, SpPD, KGH`;
+
+        const encodedMessage = encodeURIComponent(message);
+        const waNumber = ""; // Isi dengan nomor tujuan jika ingin langsung terkirim, contoh: 6281234567890
+        let waUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
+        
+        window.open(waUrl, '_blank');
+    }
+</script>
+
+</body>
+</html>
