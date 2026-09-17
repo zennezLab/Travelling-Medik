@@ -1,4 +1,4 @@
-<!DOCTQuestionnaire for Hemodialysis Patients TravelingYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -149,7 +149,8 @@
     }
 
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
         border-color: #2980b9;
         box-shadow: 0 0 0 1px rgba(41,128,185,.12);
     }
@@ -164,6 +165,28 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 8px;
+    }
+
+    /* Penyesuaian layout 3 kolom untuk Penanda Serologi */
+    .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .input-group select {
+        flex: 2;
+    }
+
+    .input-group input {
+        flex: 1.5;
+        text-align: center;
     }
 
     .signature {
@@ -404,25 +427,57 @@
             <input type="text" id="tmp" placeholder="100 – 200">
         </div>
         <div class="form-group">
-            <label>Penanda Serologi Hepatitis</label>
-            <input type="text" id="hepatitis" placeholder="Nonreaktif">
+            <label>Transfusi Darah</label>
+            <input type="text" id="transfusion" placeholder="1 kali">
+        </div>
+    </div>
+
+    <!-- PENANDA SEROLOGI (3 KOLOM dengan Dropdown & Tanggal) -->
+    <div class="form-group" style="margin-bottom: 2px;">
+        <label>Penanda Serologi</label>
+    </div>
+    <div class="form-row-3" style="margin-bottom: 5px;">
+        <div class="form-group">
+            <label>HbsAg &lt;wajib&gt;</label>
+            <div class="input-group">
+                <select id="hbsag">
+                    <option value="Non Reaktif">Non Reaktif</option>
+                    <option value="Reaktif">Reaktif</option>
+                </select>
+                <input type="text" id="hbsag_date" placeholder="Tgl Lab">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Anti HCV &lt;wajib&gt;</label>
+            <div class="input-group">
+                <select id="anti_hcv">
+                    <option value="Non Reaktif">Non Reaktif</option>
+                    <option value="Reaktif">Reaktif</option>
+                </select>
+                <input type="text" id="anti_hcv_date" placeholder="Tgl Lab">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>HIV &lt;tidak wajib&gt;</label>
+            <div class="input-group">
+                <select id="hiv">
+                    <option value="Non Reaktif">Non Reaktif</option>
+                    <option value="Reaktif">Reaktif</option>
+                </select>
+                <input type="text" id="hiv_date" placeholder="Tgl Lab">
+            </div>
         </div>
     </div>
 
     <div class="form-row">
         <div class="form-group">
-            <label>Transfusi Darah</label>
-            <input type="text" id="transfusion" placeholder="1 kali">
-        </div>
-        <div class="form-group">
             <label>Alergi</label>
             <input type="text" id="allergies" placeholder="-">
         </div>
-    </div>
-
-    <div class="form-group">
-        <label>Diet</label>
-        <input type="text" id="diet" placeholder="Diet renal">
+        <div class="form-group">
+            <label>Diet</label>
+            <input type="text" id="diet" placeholder="Diet renal">
+        </div>
     </div>
 
     <div class="form-group">
@@ -455,12 +510,13 @@
 </div>
 
 <script>
+    // Daftar ID input/select biasa
     const fieldIds = [
         "dest_hospital", "patient_name", "age", "dry_weight", "address",
         "diagnosis", "home_trained", "how_long", "bp_status", "medications",
         "lab_values", "dialysate", "dializer", "shunt", "heparinization",
-        "runs_week", "long_run", "tmp", "hepatitis", "transfusion",
-        "allergies", "diet", "complication", "comment"
+        "runs_week", "long_run", "tmp", 
+        "transfusion", "allergies", "diet", "complication", "comment"
     ];
 
     const labels = {
@@ -482,7 +538,9 @@
         runs_week: "Jumlah Dialisis per Minggu",
         long_run: "Lama Setiap Sesi Dialisis",
         tmp: "Penggunaan TMP",
-        hepatitis: "Penanda Serologi Hepatitis",
+        hbsag: "HbsAg <wajib>",
+        anti_hcv: "Anti HCV <wajib>",
+        hiv: "HIV <tidak wajib>",
         transfusion: "Transfusi Darah",
         allergies: "Alergi",
         diet: "Diet",
@@ -496,9 +554,24 @@
         return el.value.trim() || el.placeholder || "";
     }
 
+    // Fungsi khusus untuk menggabungkan Dropdown + Tanggal Lab
+    function getSerologyValue(baseId) {
+        const selectEl = document.getElementById(baseId);
+        const dateEl = document.getElementById(baseId + "_date");
+        
+        const selectVal = selectEl ? selectEl.value : "";
+        const dateVal = dateEl ? (dateEl.value.trim() || dateEl.placeholder || "") : "";
+        
+        if (dateVal) {
+            return `${selectVal} (Tgl: ${dateVal})`;
+        }
+        return selectVal;
+    }
+
     function buildWordHTML() {
         let rows = "";
 
+        // Masukkan baris biasa
         fieldIds.forEach(id => {
             const value = getValue(id).replace(/\n/g, "<br>");
             rows += `
@@ -507,6 +580,27 @@
                     <td>${value || "-"}</td>
                 </tr>`;
         });
+
+        // Sisipkan Penanda Serologi secara berurutan setelah baris TMP (indeks ke-17)
+        const serologyRows = `
+            <tr>
+                <td class="label">${labels.hbsag}</td>
+                <td>${getSerologyValue("hbsag") || "-"}</td>
+            </tr>
+            <tr>
+                <td class="label">${labels.anti_hcv}</td>
+                <td>${getSerologyValue("anti_hcv") || "-"}</td>
+            </tr>
+            <tr>
+                <td class="label">${labels.hiv}</td>
+                <td>${getSerologyValue("hiv") || "-"}</td>
+            </tr>
+        `;
+
+        // Sisipkan setelah baris ke-17 (TMP) dan sebelum baris ke-18 (Transfusi Darah)
+        const rowsArray = rows.trim().split('</tr>');
+        rowsArray.splice(17, 0, serologyRows);
+        rows = rowsArray.join('</tr>');
 
         return `
 <!DOCTYPE html>
@@ -595,7 +689,7 @@ td { border:1px solid #999; padding:4px; vertical-align:top; }
                 });
                 return;
             } catch (err) {
-                if (err.name === "AbortError") return;
+                if (err.name === 'AbortError') return;
             }
         }
 
